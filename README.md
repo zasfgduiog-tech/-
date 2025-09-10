@@ -140,7 +140,7 @@ private List<Commodity> getAllCommodities() {
         return new ArrayList<>(allCommoditiesSet);
     }
 ```
-`getAllCommodities()`方法是返回所有商品的方法，用于用户给出的检索条件为空时的情况。
+`getAllCommodities()`方法通过遍历索引并使用`HashSet`去重，来获取一个包含所有不重复商品的列表。在`search()`方法中，这个列表将作为初始的候选集，后续的所有筛选都将在这个集合的基础上进行。
 ```java
 public List<Commodity> search(SearchInfo s) {
         // 1. 从一个包含所有商品的列表开始作为我们的初始候选集
@@ -308,6 +308,12 @@ System.out.println("------String的举例说明部分-------");
        System.out.println("test4 的身份ID: " + System.identityHashCode(test4));
 ```
 这个代码块是比较`String`的`new`赋值与字面赋值存储位置的区别。通过"=="方法，可以验证它们的存储地址是否相同，这里不用`equals()`的原因，正如前文所说，`equals()`被重写了，因此使用它来检查，结果必然都是`true`。
-使用`System.identityHashCode()`方法查看其身份码，是因为这个身份码是根据其存储地址通过哈希函数所求的数值。根据哈希函数的输入值与输出值一一对应的关系，如果其身份码不同，则其存储地址也不同。  
+使用`System.identityHashCode()`方法查看其身份码，这个身份码是JVM为每个对象实例提供的唯一标识，通常根据对象的初始内存地址计算得出，并且在对象的生命周期保持不变，如果两个对象的身份码不同，它们就绝对是两个不同的对象实例。  
+
 运行结果：
 ![运行结果](week1/img_4.png)
+### 实验总结
+本次实验成功地使用`HashMap`构建了一套多属性、可组合查询的商品索引系统。通过将商品的不同属性（如名称、品牌、价格）作为键，将商品列表作为值，我们实现了类似倒排索引的高效单属性查询。对于多属性的组合查询，本系统通过逐层求交集的方式，对初始候选集进行筛选，最终得到满足所有条件的商品列表，展现了良好的灵活性和扩展性。  
+实验第二部分探究了`HashMap`键的核心要求。通过对比`String`和`StringBuilder`作为键的不同表现，验证了不可变性对于键的重要性。`String`因其不可变性，以及基于内容重写的`hashCode()`和`equals()`方法，确保了`HashMap`的稳定性和可靠性。而`StringBuilder`作为可变对象，且其`hashCode()`和`equals()`基于身份，在作为键时会导致数据“逻辑丢失”和一系列不可预测的行为，证明了其不适合作为键。  
+最后，通过`==`运算符和`System.identityHashCode()`的对比，本实验清晰地展示了`String`字面量赋值（共享常量池对象）和`new`关键字赋值（创建独立堆对象）在内存管理上的根本差异。
+综上，本实验不仅依据`HashMap`构建了商品索引，在完成编程任务的同时，也加深了对`HashMap`底层原理，`String`不可变性及Java相等性判断等核心概念的理解。
